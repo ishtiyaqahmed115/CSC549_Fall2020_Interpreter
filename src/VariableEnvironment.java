@@ -26,6 +26,7 @@ public class VariableEnvironment
 		theVariables.add(nvp);
 	}
 	
+	
 	//take in a name and it should retrieve the value associated
 	//with that variable name.  For now, you can assume that
 	//any name you look for, will be found.
