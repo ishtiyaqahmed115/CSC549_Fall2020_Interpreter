@@ -15,13 +15,15 @@ public class VariableEnvironment
 		{
 			nvp.display();
 		}
+		
 	}
 	
 	//take in a name and a value and create a NameValuePair and add
 	//it to theVariables
 	public void addVariable(String name, int value)
 	{
-		
+		NameValuePair nvp = new NameValuePair(name, value);
+		theVariables.add(nvp);
 	}
 	
 	//take in a name and it should retrieve the value associated
@@ -29,6 +31,13 @@ public class VariableEnvironment
 	//any name you look for, will be found.
 	public int getValue(String name)
 	{
-		return -1;
+		int value = 0;
+		for(int i =0 ; i< theVariables.size(); i++) {
+			if(name == theVariables.get(i).getName()) {
+				value = theVariables.get(i).getValue();
+			} 
+		}
+		return value;
+		
 	}
 }
