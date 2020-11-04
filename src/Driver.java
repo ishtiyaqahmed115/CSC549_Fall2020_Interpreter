@@ -7,7 +7,9 @@ public class Driver
 		
 
 		Parser.parse("input.spyder");
-		Parser.display();
+		//Parser.display();
+		SpyderInterpreter.interpret(Parser.getParsedStatements());
+		SpyderInterpreter.displayResults();
 		
 //		VariableEnvironment env = new VariableEnvironment();
 //		env.addVariable("a", 5);

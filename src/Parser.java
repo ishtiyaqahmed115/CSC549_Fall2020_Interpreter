@@ -6,6 +6,12 @@ public class Parser
 {
 	static ArrayList<Statement> theListOfStatements = new ArrayList<Statement>();
 	
+	
+	public static ArrayList<Statement> getParsedStatements()
+	{
+		return Parser.theListOfStatements;
+	}
+	
 	static void display()
 	{
 		for(Statement s : theListOfStatements)
