@@ -4,3 +4,6 @@
 /RememberStatement.class
 /ResolveExpression.class
 /Statement.class
+/DoMathExpression.class
+/Int_LiteralExpression.class
+/LiteralExpression.class

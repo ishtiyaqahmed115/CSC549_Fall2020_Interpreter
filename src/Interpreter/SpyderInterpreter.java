@@ -44,6 +44,46 @@ public class SpyderInterpreter
 		return true;
 	}
 	
+	private static int interpretLiteralExpression(LiteralExpression le)
+	{
+		if(le instanceof Int_LiteralExpression)
+		{
+			return ((Int_LiteralExpression) le).getValue();
+		}
+		throw new RuntimeException("Not a valid literal type...");
+	}
+	
+	private static int interpretDoMathExpression(DoMathExpression dme)
+	{
+		Expression left = dme.getLeft();
+		int leftValue = SpyderInterpreter.getExpressionValue(left);
+		Expression right = dme.getRight();
+		int rightValue = SpyderInterpreter.getExpressionValue(right);
+		String math_op = dme.getOp();
+		
+		if(math_op.equals("+"))
+		{
+			return leftValue + rightValue;
+		}
+		else if(math_op.equals("-"))
+		{
+			return leftValue - rightValue;
+		}
+		else if(math_op.equals("*"))
+		{
+			return leftValue * rightValue;
+		}
+		else if(math_op.equals("/"))
+		{
+			return leftValue / rightValue;
+		}
+		else if(math_op.equals("%"))
+		{
+			return leftValue % rightValue;
+		}
+		throw new RuntimeException("Not a valid math operator: " + math_op);
+	}
+	
 	private static int interpretResolveExpression(ResolveExpression rs)
 	{
 		
@@ -70,25 +110,20 @@ public class SpyderInterpreter
 		}
 	}
 	
-	private static int interpretDoMathExpression(DoMathStatement dms)
-	{
-		return DoMathStatement.DoMath(SpyderInterpreter.interpretResolveExpression((ResolveExpression)dms.getE1()), dms.getOperator(),
-				SpyderInterpreter.interpretResolveExpression((ResolveExpression)dms.getE2()));
-		
-	}
-	
-	
-	
 	private static int getExpressionValue(Expression e)
 	{
 		if(e instanceof ResolveExpression)
 		{
 			return SpyderInterpreter.interpretResolveExpression((ResolveExpression)e);
 		}
-		if(e instanceof DoMathStatement) {
-			return SpyderInterpreter.interpretDoMathExpression((DoMathStatement)e);
+		else if(e instanceof LiteralExpression)
+		{
+			return SpyderInterpreter.interpretLiteralExpression((LiteralExpression) e);
 		}
-		
+		else if(e instanceof DoMathExpression)
+		{
+			return SpyderInterpreter.interpretDoMathExpression((DoMathExpression) e);
+		}
 		throw new RuntimeException("Not a known expression type: " + e.getExpressionType());
 	}
 	
