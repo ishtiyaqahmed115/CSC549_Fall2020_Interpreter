@@ -1,9 +1,7 @@
 package Parser;
 import java.io.File;
-import java.util.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Set;
 
 public class Parser 
 {
@@ -30,24 +28,78 @@ public class Parser
 		return rs;
 	}
 	
+	private static boolean isMathOp(String s)
+	{
+		return "+-*/%".indexOf(s.trim()) > -1;
+	}
+	
+	private static int getDoMathExpressionEndBucket(int startPos, String[] theParts)
+	{
+		//do-math do-math a + 7 + do-math b + 4
+		int opCount = 0;
+		while(startPos < theParts.length)
+		{
+			if(theParts[startPos].equals("do-math"))
+			{
+				opCount++;
+			}
+			else if(Parser.isMathOp(theParts[startPos]))
+			{
+				opCount--;
+				if(opCount == 0)
+				{
+					return startPos-1; //add startPos to the end of the string
+				}
+			}
+			startPos++;
+		}
+		return startPos;
+		
+	}
 	static DoMathExpression parseDoMath(String expression)
 	{
-		//do-math do-math a + 7 + 4 - doesn't work for this YET!
+		//do-math do-math a + 7 + do-math b + 4 - doesn't work for this YET!
+		//do-math expression op expression
 		//make the above work for HW
 		
 		//do-math a + 7 - will work for this
 		// (resolve expression a) + (int_lit expression 7)
 		//right now we are assuming only a single level of do-math
 		String[] theParts = expression.split("\\s+");
-		if(theParts[3].equals("do-math")){
-			theParts[3] = theParts[3 + 1];
-			System.out.println("expression caught "+expression + theParts[3]);
+		Expression left;
+		int pos = 1;
+		String temp = "";
+		if(theParts[pos].equals("do-math"))
+		{
+			//we need to handle the left expression as a do-math expression
+			//left side contains at least 1 do-math expression
+			//capture the substring from the current point until we reach the appropriate
+			//operator
+			pos = Parser.getDoMathExpressionEndBucket(0, theParts);
+			//pos is the position in theParts where the do math is complete for the left side
+			
+			for(int i = 1; i <= pos; i++)
+			{
+				temp += theParts[i] + " ";
+			}
+			left = Parser.parseDoMath(temp.trim()); 
 		}
-		Expression left = Parser.parseExpression(theParts[1]);
-		String math_op = theParts[2];
-		Expression right = Parser.parseExpression(theParts[3]);
+		else
+		{
+			//it is either a resolve or literal expression
+			left = Parser.parseExpression(theParts[pos]);
+		}
 		
+		String math_op = theParts[pos+1];
 		
+		//everything from pos+2 forward is the right half of our do-math expression
+	    temp = "";
+		for(int i = pos+2; i < theParts.length; i++)
+		{
+			temp += theParts[i] + " ";
+		}
+		Expression right = Parser.parseExpression(temp.trim());
+	
 		//create and return an instance of DoMathExpression
 		DoMathExpression theResult = new DoMathExpression(left, math_op, right);
 		return theResult;
@@ -103,12 +155,10 @@ public class Parser
 		if(theParts[0].equals("do-math"))
 		{
 			//must be a do-math expression
-			
 			return Parser.parseDoMath(expression);
 		}
 		else if(Character.isDigit(theParts[0].charAt(0))) //does the value start with a number
 		{
-			
 			//must a literal expression
 			return Parser.parseLiteral(expression);
 		}
