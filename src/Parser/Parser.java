@@ -1,7 +1,9 @@
 package Parser;
 import java.io.File;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Parser 
 {
@@ -37,9 +39,14 @@ public class Parser
 		// (resolve expression a) + (int_lit expression 7)
 		//right now we are assuming only a single level of do-math
 		String[] theParts = expression.split("\\s+");
+		if(theParts[3].equals("do-math")){
+			theParts[3] = theParts[3 + 1];
+			System.out.println("expression caught "+expression + theParts[3]);
+		}
 		Expression left = Parser.parseExpression(theParts[1]);
 		String math_op = theParts[2];
 		Expression right = Parser.parseExpression(theParts[3]);
+		
 		
 		//create and return an instance of DoMathExpression
 		DoMathExpression theResult = new DoMathExpression(left, math_op, right);
@@ -96,10 +103,12 @@ public class Parser
 		if(theParts[0].equals("do-math"))
 		{
 			//must be a do-math expression
+			
 			return Parser.parseDoMath(expression);
 		}
 		else if(Character.isDigit(theParts[0].charAt(0))) //does the value start with a number
 		{
+			
 			//must a literal expression
 			return Parser.parseLiteral(expression);
 		}

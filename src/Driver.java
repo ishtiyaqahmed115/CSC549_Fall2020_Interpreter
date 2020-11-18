@@ -10,7 +10,7 @@ public class Driver
 		//Parser.display();
 		Interpreter.SpyderInterpreter.interpret(Parser.getParsedStatements());
 		Interpreter.SpyderInterpreter.displayResults();
-		int a = 5;	
+		int a = 5;
 		
 	}
 }

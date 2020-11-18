@@ -53,7 +53,7 @@ public class SpyderInterpreter
 		throw new RuntimeException("Not a valid literal type...");
 	}
 	
-	private static int interpretDoMathExpression(DoMathExpression dme)
+	public static int interpretDoMathExpression(DoMathExpression dme)
 	{
 		Expression left = dme.getLeft();
 		int leftValue = SpyderInterpreter.getExpressionValue(left);
