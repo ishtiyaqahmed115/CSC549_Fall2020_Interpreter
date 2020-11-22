@@ -37,6 +37,7 @@ public class Parser
 	{
 		//do-math do-math a + 7 + do-math b + 4
 		int opCount = 0;
+
 		while(startPos < theParts.length)
 		{
 			if(theParts[startPos].equals("do-math"))
@@ -66,6 +67,7 @@ public class Parser
 		// (resolve expression a) + (int_lit expression 7)
 		//right now we are assuming only a single level of do-math
 		String[] theParts = expression.split("\\s+");
+		
 		Expression left;
 		int pos = 1;
 		String temp = "";
@@ -76,6 +78,8 @@ public class Parser
 			//capture the substring from the current point until we reach the appropriate
 			//operator
 			pos = Parser.getDoMathExpressionEndBucket(0, theParts);
+			
+
 			//pos is the position in theParts where the do math is complete for the left side
 			
 			for(int i = 1; i <= pos; i++)
@@ -83,12 +87,15 @@ public class Parser
 				temp += theParts[i] + " ";
 			}
 			left = Parser.parseDoMath(temp.trim()); 
+			
 		}
 		else
 		{
 			//it is either a resolve or literal expression
 			left = Parser.parseExpression(theParts[pos]);
+			
 		}
+		
 		
 		String math_op = theParts[pos+1];
 		
@@ -99,6 +106,7 @@ public class Parser
 			temp += theParts[i] + " ";
 		}
 		Expression right = Parser.parseExpression(temp.trim());
+		
 	
 		//create and return an instance of DoMathExpression
 		DoMathExpression theResult = new DoMathExpression(left, math_op, right);
@@ -110,13 +118,56 @@ public class Parser
 		//We ONLY have a single LiteralType - int literal
 		return new Int_LiteralExpression(Integer.parseInt(value));
 	}
-	
+	static TestExpression parseTestExpression(String expression)
+	{
+		String[] theParts = expression.split("\\s+");
+		String[] doStatement = expression.split("do");
+		String doStatementStr = null;
+		String otherwiseStatementStr = null;
+
+		if(theParts[0].equals("test"))
+		{
+			System.out.println("Expression Caught : "+theParts[0]);
+		}
+		for(int i =0; i < doStatement.length ; i++) {
+			if(i == 1) {
+				doStatementStr = doStatement[i];
+			}
+		}
+		String[] otherwiseStatement = doStatementStr.split("otherwise");
+		for(int i =0; i < otherwiseStatement.length ; i++) {
+			if(i == 0) {
+				doStatementStr = otherwiseStatement[i];
+			}
+			if(i == 1) {
+				otherwiseStatementStr = otherwiseStatement[i];
+			}
+		}
+		
+		System.out.println("doStatement "+doStatementStr);
+		System.out.println("otherwiseStatement "+otherwiseStatementStr);
+
+		Expression leftExpression = Parser.parseExpression(theParts[1]);
+		String logicalOperator = theParts[2];
+		Expression rightExpression = Parser.parseExpression(theParts[3]);
+		
+		TestExpression theResult = new TestExpression(leftExpression,logicalOperator,rightExpression);
+		return theResult;
+	}
 	static RememberStatement parseRemember(String type, String name, Expression valueExpression)
 	{
 		//parse this string into language objects
 		//turn remember syntax into a RememberStatement
 		RememberStatement rs = new RememberStatement(type, name, valueExpression);
 		return rs;
+	}
+	
+	static QuestionStatement parseQuestion( Expression booleanExpression)
+	{
+		//parse this string into language objects
+		//turn remember syntax into a QuestionStatement
+		QuestionStatement qs = new QuestionStatement(booleanExpression);
+		return qs;
 	}
 	
 	public static void parse(String filename)
@@ -152,6 +203,11 @@ public class Parser
 		//Possible expressions types:
 		// do-math, resolve, literal
 		String[] theParts = expression.split("\\s+");
+		if(theParts[0].equals("test"))
+		{
+			//must be a test expression
+			return Parser.parseTestExpression(expression);
+		}
 		if(theParts[0].equals("do-math"))
 		{
 			//must be a do-math expression
@@ -188,6 +244,15 @@ public class Parser
 			//parse a remember statement with type, name, and value
 			theListOfStatements.add(Parser.parseRemember(theParts[1], 
 					theParts[2], Parser.parseExpression(everythingAfterTheEqualSign)));
+		}
+		if(theParts[0].equals("question"))
+		{
+			int posOfTestKeyword = s.indexOf("test");
+			String everythingAfterTestKeyword = s.substring(posOfTestKeyword).trim();
+			System.out.println("everythingAfterTestKeyword "+everythingAfterTestKeyword);
+		
+			//parse a question statement with booleanExpression
+			theListOfStatements.add(Parser.parseQuestion(Parser.parseExpression(everythingAfterTestKeyword)));
 		}
 	}
 }
