@@ -222,10 +222,19 @@ public class SpyderInterpreter
 		//TODO Add remember functionality after finding true or fasle from interpretBooleanExpression
 		//Just call the SpyderInterpreter.interpretRememberStatement((RememberStatement)s); and pass the correct remember Statement.
 		System.out.println("answer "+result);
-//		SpyderInterpreter.theOutput.add("<HIDDEN> Updated " + rs.getName() + " = " + answer + " to the variable environment.");
-
 		
-//		SpyderInterpreter.theEnv.addVariable(rs.getName(), answer);
-//		SpyderInterpreter.theOutput.add("<HIDDEN> Added " + rs.getName() + " = " + answer + " to the variable environment.");
+		Expression valueExpression = qs.getRememberStatement().getValueExpression();
+		int updatedValue = SpyderInterpreter.getExpressionValue(valueExpression);
+		try {
+			SpyderInterpreter.theEnv.updateVariable(qs.getRememberStatement().getName(), updatedValue);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		SpyderInterpreter.theOutput.add("<HIDDEN> Updated " + qs.getRememberStatement().getName() +
+				" = " + qs.getRememberStatement().getValueExpression() + " to the variable environment.");
+		
+
+
 	}
 }

@@ -3,13 +3,17 @@ package Parser;
 public class QuestionStatement extends Statement{
 	
 	private Expression booleanExpression;
+	private RememberStatement rememberStatement;
 
 	
 
-	public QuestionStatement(Expression booleanExpression) {
+	
+
+	public QuestionStatement(Expression booleanExpression, RememberStatement rememberStatement) {
 		// TODO Auto-generated constructor stub
 		super("Question Statement");
 		this.booleanExpression = booleanExpression;
+		this.rememberStatement = rememberStatement;
 	}
 	
 	public String toString()
@@ -24,4 +28,10 @@ public class QuestionStatement extends Statement{
 		return booleanExpression;
 	}
 
+	/**
+	 * @return the rememberStatement
+	 */
+	public RememberStatement getRememberStatement() {
+		return rememberStatement;
+	}
 }

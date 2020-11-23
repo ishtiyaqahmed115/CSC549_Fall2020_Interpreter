@@ -118,7 +118,7 @@ public class Parser
 		//We ONLY have a single LiteralType - int literal
 		return new Int_LiteralExpression(Integer.parseInt(value));
 	}
-	static TestExpression parseTestExpression(String expression)
+	static String parseDoStatement(String expression)
 	{
 		String[] theParts = expression.split("\\s+");
 		String[] doStatement = expression.split("do");
@@ -143,9 +143,42 @@ public class Parser
 				otherwiseStatementStr = otherwiseStatement[i];
 			}
 		}
-		
+		doStatementStr = doStatementStr.trim();
+		otherwiseStatementStr = otherwiseStatementStr.trim();
 		System.out.println("doStatement "+doStatementStr);
+		return doStatementStr;
+	}
+	static String parseOtherWiseStatement(String expression)
+	{
+		
+		String[] doStatement = expression.split("do");
+		String doStatementStr = null;
+		String otherwiseStatementStr = null;
+
+		for(int i =0; i < doStatement.length ; i++) {
+			if(i == 1) {
+				doStatementStr = doStatement[i];
+			}
+		}
+		String[] otherwiseStatement = doStatementStr.split("otherwise");
+		for(int i =0; i < otherwiseStatement.length ; i++) {
+			if(i == 0) {
+				doStatementStr = otherwiseStatement[i];
+			}
+			if(i == 1) {
+				otherwiseStatementStr = otherwiseStatement[i];
+			}
+		}
+		doStatementStr = doStatementStr.trim();
+		otherwiseStatementStr = otherwiseStatementStr.trim();
 		System.out.println("otherwiseStatement "+otherwiseStatementStr);
+		return otherwiseStatementStr;
+	}
+	
+	static TestExpression parseTestExpression(String expression)
+	{
+		String[] theParts = expression.split("\\s+");
+		
 
 		Expression leftExpression = Parser.parseExpression(theParts[1]);
 		String logicalOperator = theParts[2];
@@ -158,15 +191,15 @@ public class Parser
 	{
 		//parse this string into language objects
 		//turn remember syntax into a RememberStatement
-		RememberStatement rs = new RememberStatement(type, name, valueExpression);
+		RememberStatement rs = new RememberStatement(type , name , valueExpression);
 		return rs;
 	}
 	
-	static QuestionStatement parseQuestion( Expression booleanExpression)
+	static QuestionStatement parseQuestion( Expression booleanExpression , RememberStatement rememberStatement)
 	{
 		//parse this string into language objects
 		//turn remember syntax into a QuestionStatement
-		QuestionStatement qs = new QuestionStatement(booleanExpression);
+		QuestionStatement qs = new QuestionStatement(booleanExpression , rememberStatement);
 		return qs;
 	}
 	
@@ -251,8 +284,23 @@ public class Parser
 			String everythingAfterTestKeyword = s.substring(posOfTestKeyword).trim();
 			System.out.println("everythingAfterTestKeyword "+everythingAfterTestKeyword);
 		
+			String thedoRememberParts[] = Parser.parseDoStatement(everythingAfterTestKeyword.trim()).split("\\s+");
+			String theOtherWiseRememberParts[] = Parser.parseOtherWiseStatement(everythingAfterTestKeyword.trim()).split("\\s+");
+		
+			//parse a remember statement with type, name, and value
+			
+			String doType = thedoRememberParts[1];
+			String doName = thedoRememberParts[2];
+			Expression doValueExpression = Parser.parseExpression(thedoRememberParts[4]);
+			
+			String otherWiseType = theOtherWiseRememberParts[1];
+			String otherWiseName = theOtherWiseRememberParts[2];
+			Expression otherWiseValueExpression = Parser.parseExpression(theOtherWiseRememberParts[4]);
+			
 			//parse a question statement with booleanExpression
-			theListOfStatements.add(Parser.parseQuestion(Parser.parseExpression(everythingAfterTestKeyword)));
+			theListOfStatements.add(Parser.parseQuestion(Parser.parseExpression(everythingAfterTestKeyword),
+					Parser.parseRemember(doType, doName, doValueExpression)));
+			
 		}
 	}
 }

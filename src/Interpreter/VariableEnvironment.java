@@ -29,7 +29,7 @@ public class VariableEnvironment
 	{
 		for(NameValuePair nvp: this.theVariables)
 		{
-			System.out.println("this.theVariables "+nvp.getName()+" "+nvp.getValue());
+			
 			if(nvp.getName().equals(name))
 			{
 				this.theVariables.set(this.theVariables.indexOf(nvp),new NameValuePair(name, value));
