@@ -24,8 +24,8 @@ public class VariableEnvironment
 	{
 		this.theVariables.add(new NameValuePair(name, value));
 	}
-	
-	public void updateVariable(String name, int value)
+	//update the value of the variable if it is found in the environment
+	public int updateVariable(String name, int value) throws Exception
 	{
 		for(NameValuePair nvp: this.theVariables)
 		{
@@ -33,10 +33,12 @@ public class VariableEnvironment
 			if(nvp.getName().equals(name))
 			{
 				this.theVariables.set(this.theVariables.indexOf(nvp),new NameValuePair(name, value));
+				return 1;
+				
 			}
 		}
+		throw new Exception("Variable Not found");
 	}
-	
 	//take in a name and it should retrieve the value associated
 	//with that variable name.  For now, you can assume that
 	//any name you look for, will be found.
@@ -44,7 +46,6 @@ public class VariableEnvironment
 	{
 		for(NameValuePair nvp: this.theVariables)
 		{
-			
 			if(nvp.getName().equals(name))
 			{
 				return nvp.getValue();

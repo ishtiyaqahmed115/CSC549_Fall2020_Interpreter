@@ -1,37 +1,38 @@
 package Parser;
 
-public class QuestionStatement extends Statement{
+public class QuestionStatement extends Statement
+{
+	private TestExpression testExpression;
+	private Statement trueStatement;
+	private Statement falseStatement;
 	
-	private Expression booleanExpression;
-	private RememberStatement rememberStatement;
-
-	
-
-	
-
-	public QuestionStatement(Expression booleanExpression, RememberStatement rememberStatement) {
-		// TODO Auto-generated constructor stub
+	public QuestionStatement(TestExpression testExpression, Statement trueStatement, Statement falseStatement)
+	{
 		super("Question Statement");
-		this.booleanExpression = booleanExpression;
-		this.rememberStatement = rememberStatement;
+		this.testExpression = testExpression;
+		this.trueStatement = trueStatement;
+		this.falseStatement = falseStatement;
 	}
-	
+
 	public String toString()
 	{
-		return super.toString() + "\n\t" + " = " + this.booleanExpression;
-	}
-	
-	/**
-	 * @return the booleanExpression
-	 */
-	public Expression getBooleanExpression() {
-		return booleanExpression;
+		return super.toString() + "\n\t" + this.testExpression.toString() +
+				"\n\t\t" + this.trueStatement.toString() + 
+				"\n\t\t" + this.falseStatement.toString();				
 	}
 
-	/**
-	 * @return the rememberStatement
-	 */
-	public RememberStatement getRememberStatement() {
-		return rememberStatement;
+	public TestExpression getTestExpression() {
+		return testExpression;
 	}
+
+	public Statement getTrueStatement() {
+		return trueStatement;
+	}
+
+	public Statement getFalseStatement() {
+		return falseStatement;
+	}
+
+	
 }
+

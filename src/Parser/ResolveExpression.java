@@ -17,6 +17,6 @@ public class ResolveExpression extends Expression
 
 	public String getName() 
 	{
-		return name;
+		return name.trim();
 	}	
 }
