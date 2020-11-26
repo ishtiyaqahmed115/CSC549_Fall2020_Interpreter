@@ -272,7 +272,12 @@ public class SpyderInterpreter
 	{
 		TestExpression testExpression = rs.getTestExpression();
 		int answer = SpyderInterpreter.getExpressionValue(testExpression);
-		SpyderInterpreter.interpretStatement(rs.getUpdateStatement());
+		//If the boolean Expression returns True-1 then Call the function until it becomes False-0.
+		if(answer != 0) {
+			SpyderInterpreter.interpretStatement(rs.getUpdateStatement());
+			SpyderInterpreter.interpretRepeatStatement((RepeatStatement)rs);
+		}
+		
 	}
 	
 }
