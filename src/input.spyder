@@ -6,3 +6,4 @@ remember int d = do-math c + 4;
 remember int e = do-math b + do-math c - do-math 5 * 4;
 question test b > e do remember int c = 1 otherwise remember int c = 2;
 update a = do-math b + e;
+while test e < 20 update e = do-math e + 1;

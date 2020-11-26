@@ -34,6 +34,10 @@ public class SpyderInterpreter
 		{
 			SpyderInterpreter.interpretUpdateStatement((UpdateStatement)s);
 		}
+		else if(s instanceof RepeatStatement)
+		{
+			SpyderInterpreter.interpretRepeatStatement((RepeatStatement)s);
+		}
 	}
 	
 	public static void interpret(ArrayList<Statement> theStatements)
@@ -262,6 +266,13 @@ public class SpyderInterpreter
 			//testExpression was false, so execute the falseStatement
 			SpyderInterpreter.interpretStatement(qs.getFalseStatement());
 		}
+	}
+	
+	private static void interpretRepeatStatement(RepeatStatement rs)
+	{
+		TestExpression testExpression = rs.getTestExpression();
+		int answer = SpyderInterpreter.getExpressionValue(testExpression);
+		SpyderInterpreter.interpretStatement(rs.getUpdateStatement());
 	}
 	
 }

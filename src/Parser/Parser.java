@@ -177,6 +177,12 @@ public class Parser
 		UpdateStatement us = new UpdateStatement(name, valueExpression);
 		return us;
 	}
+	static RepeatStatement parseRepeat(TestExpression testExpression, Statement updateStatement)
+	{
+		RepeatStatement rs = new RepeatStatement(testExpression, updateStatement);
+		return rs;
+	}
+	
 	
 	public static void parse(String filename)
 	{
@@ -276,6 +282,20 @@ public class Parser
 	
 			//parse a update statement with type, name, and value
 			return Parser.parseUpdate(theParts[1], Parser.parseExpression(everythingAfterTheEqualSign));
+		}
+		
+		else if(theParts[0].equals("while"))
+		{
+			String expression = s.substring("while".length()).trim();
+			int posOfUpdateKeyword = expression.indexOf("update");
+			String testExpression = expression.substring(0, posOfUpdateKeyword).trim();
+			expression = expression.substring(posOfUpdateKeyword).trim();
+			String updateStatement = expression;
+
+			return Parser.parseRepeat(
+							(TestExpression)Parser.parseExpression(testExpression), 
+							Parser.parseStatement(updateStatement));
+			
 		}
 		throw new RuntimeException("Not a known statement type: " + s);
 	}
