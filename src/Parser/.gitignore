@@ -11,3 +11,5 @@
 /TestExpression.class
 /UpdateStatement.class
 /RepeatStatement.class
+/WhileStatement.class
+/PrintStatement.class

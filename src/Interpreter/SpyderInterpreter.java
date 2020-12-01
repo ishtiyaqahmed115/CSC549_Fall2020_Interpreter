@@ -26,17 +26,21 @@ public class SpyderInterpreter
 			//interpret a remember statement
 			SpyderInterpreter.interpretRememberStatement((RememberStatement)s);
 		}
-		else if(s instanceof QuestionStatement)
-		{
-			SpyderInterpreter.interpretQuestionStatement((QuestionStatement)s);
-		}
 		else if(s instanceof UpdateStatement)
 		{
 			SpyderInterpreter.interpretUpdateStatement((UpdateStatement)s);
 		}
-		else if(s instanceof RepeatStatement)
+		else if(s instanceof QuestionStatement)
 		{
-			SpyderInterpreter.interpretRepeatStatement((RepeatStatement)s);
+			SpyderInterpreter.interpretQuestionStatement((QuestionStatement)s);
+		}
+		else if(s instanceof WhileStatement)
+		{
+			SpyderInterpreter.interpretWhileStatement((WhileStatement)s);
+		}
+		else if(s instanceof PrintStatement)
+		{
+			SpyderInterpreter.interpretPrintStatement((PrintStatement)s);
 		}
 	}
 	
@@ -231,23 +235,40 @@ public class SpyderInterpreter
 		SpyderInterpreter.theEnv.addVariable(rs.getName(), answer);
 		SpyderInterpreter.theOutput.add("<HIDDEN> Added " + rs.getName() + " = " + answer + " to the variable environment.");
 	}
+	
+	private static void interpretWhileStatement(WhileStatement ws)
+	{
+		if(ws.getTest_expression() instanceof TestExpression)
+		{
+			TestExpression te = (TestExpression)ws.getTest_expression();
+			Statement stmt = ws.getStatement_to_execute();
+			while(SpyderInterpreter.interpretTestExpression(te) != 0)
+			{
+				SpyderInterpreter.interpretStatement(stmt);
+			}
+		}
+		else
+		{
+			throw new RuntimeException("While Loops require a TestExpression!!!");
+		}
+		
+		
+	}
 	private static void interpretUpdateStatement(UpdateStatement us)
 	{
 		//we need to resolve this expression before we can actually remember anything
 		Expression valueExpression = us.getValueExpression();
 		int answer = SpyderInterpreter.getExpressionValue(valueExpression);
 		
-		try {
-			int isUpdated = SpyderInterpreter.theEnv.updateVariable(us.getName(), answer);
-			//If the Variable returns True, then add the update statement to the output.
-			if(isUpdated == 1) {
-				SpyderInterpreter.theOutput.add("<HIDDEN> Updated " + us.getName() + " = " + answer + " to the variable environment.");
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		SpyderInterpreter.theEnv.updateVariable(us.getName(), answer);
+		SpyderInterpreter.theOutput.add("<HIDDEN> Updated " + us.getName() + " = " + answer + " in the variable environment.");
+	}
+	
+	private static void interpretPrintStatement(PrintStatement ps)
+	{
+		Expression expression_to_print = ps.getExpression_to_print();
+		int answer = SpyderInterpreter.getExpressionValue(expression_to_print);
+		SpyderInterpreter.theOutput.add("***** " + answer);
 	}
 	
 	private static void interpretQuestionStatement(QuestionStatement qs)
@@ -266,18 +287,6 @@ public class SpyderInterpreter
 			//testExpression was false, so execute the falseStatement
 			SpyderInterpreter.interpretStatement(qs.getFalseStatement());
 		}
-	}
-	
-	private static void interpretRepeatStatement(RepeatStatement rs)
-	{
-		TestExpression testExpression = rs.getTestExpression();
-		int answer = SpyderInterpreter.getExpressionValue(testExpression);
-		//If the boolean Expression returns True-1 then Call the function until it becomes False-0.
-		if(answer != 0) {
-			SpyderInterpreter.interpretStatement(rs.getUpdateStatement());
-			SpyderInterpreter.interpretRepeatStatement((RepeatStatement)rs);
-		}
-		
 	}
 	
 }
