@@ -1,7 +1,10 @@
 package Parser;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
+
+import Interpreter.SpyderInterpreter;
 
 public class Parser 
 {
@@ -165,7 +168,7 @@ public class Parser
 		return rs;
 	}
 	
-	static WhileStatement parseWhile(Expression testExpression, Statement executeStatement)
+	static WhileStatement parseWhile(Expression testExpression, ArrayList<Statement> executeStatement)
 	{
 		WhileStatement ws = new WhileStatement(testExpression, executeStatement);
 		return ws;
@@ -277,9 +280,31 @@ public class Parser
 			String[] tempParts = temp.split("do ");
 			String test_expression_string = tempParts[0].trim();
 			String execute_statement_string = tempParts[1].trim();
+			String[] tempblockParts = null;
+			ArrayList<Statement> theListOfBlockStatements = new ArrayList<Statement>();
+			if(execute_statement_string.contains("begin")) {
+				System.out.println("execute_statement_string "+execute_statement_string);
+				String blockStatements = execute_statement_string.substring("begin".length(), execute_statement_string.length() - "end".length()).trim();
+				tempblockParts = blockStatements.split(",");
+				//If it has any previous statments stored, clear them all.
+				theListOfBlockStatements.clear();
+				for(int i = 0 ; i< tempblockParts.length ;i++) {
+					System.out.println("theListOfBlockStatements "+tempblockParts[i].trim());
+					theListOfBlockStatements.add(parseStatement(tempblockParts[i].trim()));
+
+				}
+				
+			}
+			else {
+				//If it has any previous statments stored, clear them all.
+				theListOfBlockStatements.clear();
+				theListOfBlockStatements.add(parseStatement(execute_statement_string));
+			}
+			
 			Expression test_expression = Parser.parseExpression(test_expression_string);
-			Statement execute_statement = Parser.parseStatement(execute_statement_string);
-			return Parser.parseWhile(test_expression, execute_statement);
+			return Parser.parseWhile(test_expression,theListOfBlockStatements );
+			
+			
 		}
 		else if(theParts[0].equals("update"))
 		{
@@ -308,4 +333,5 @@ public class Parser
 		}
 		throw new RuntimeException("Not a known statement type: " + s);
 	}
+	 
 }

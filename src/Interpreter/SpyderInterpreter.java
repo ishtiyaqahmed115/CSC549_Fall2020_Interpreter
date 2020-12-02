@@ -241,10 +241,13 @@ public class SpyderInterpreter
 		if(ws.getTest_expression() instanceof TestExpression)
 		{
 			TestExpression te = (TestExpression)ws.getTest_expression();
-			Statement stmt = ws.getStatement_to_execute();
-			while(SpyderInterpreter.interpretTestExpression(te) != 0)
+			ArrayList<Statement> stmt = ws.getStatement_to_execute();
+			while(SpyderInterpreter.interpretTestExpression(te) != 0 )
 			{
-				SpyderInterpreter.interpretStatement(stmt);
+				for(Statement s : stmt)
+				{
+					SpyderInterpreter.interpretStatement(s);
+				}
 			}
 		}
 		else
