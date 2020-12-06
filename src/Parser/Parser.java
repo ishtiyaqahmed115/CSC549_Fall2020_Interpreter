@@ -1,10 +1,7 @@
 package Parser;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Scanner;
-
-import Interpreter.SpyderInterpreter;
 
 public class Parser 
 {
@@ -74,7 +71,117 @@ public class Parser
 		return startPos;
 		
 	}
-	
+
+	private static String SplitBlock (String statement) {
+		
+		String temp = statement.substring(statement.indexOf("begin") + "begin".length(),statement.length() - "end".length()).trim();
+		System.out.println("temp "+temp);
+
+
+		int pos = 0;
+		int beginCount = 0;
+		String blockStatement = "";
+		String leftOutStatement = "";
+
+		String beginString = "begin";
+		String commaString = ",";
+		
+		String collectString;
+		String leftOutString;
+		
+		//While there are some chars
+		while(temp.charAt(pos) != ' ')
+		{
+			pos++;
+			//Find the first begin in the String
+			int beginIndex = temp.indexOf(beginString);
+			int commaIndex = temp.indexOf(commaString);
+
+			//If found
+			if(beginIndex > 0) 
+			{
+				//Find the pos of next Comma
+				commaIndex = temp.indexOf(",",commaIndex);
+
+				//If comma comes before begin, then
+				if(commaIndex < beginIndex) 
+				{
+					
+					//Collect chars upto next Comma
+					collectString = temp.substring(0,commaIndex).trim();
+					System.out.println("collectString "+collectString);
+					//Take Substring from comma to the end.
+					leftOutString = temp.substring(commaIndex + 1, temp.length()).trim();
+					System.out.println("leftOutString "+leftOutString);
+					leftOutStatement = leftOutString;
+					//beginIndex += ("begin".length() - 1);
+					//Bypass the comma
+					commaIndex += (",".length() - 1);
+
+					
+//					System.out.println("beginIndex af "+beginIndex);
+//					System.out.println("commaIndex af "+commaIndex);
+
+
+
+				}
+				//If comma comes After begin, then
+				else if (commaIndex > beginIndex) 
+				{
+					System.out.println("commaIndex if begins comes after ,  "+commaIndex);
+					String recordString = "";
+					//Process the begin by calling itself.
+					SplitBlock(leftOutStatement);
+					//Collect chars until you hit a space or comma
+					while(temp.charAt(pos) != ' ' || temp.charAt(pos) != ',') {
+						//ask if it is a begin or end or other
+						
+						String str[] = temp.split(" ");
+						for(int i = 0; i < str.length; i++)
+						{
+							if(str[i].equals(beginString))
+							{
+								beginCount++;
+								recordString = recordString + temp.charAt(pos);
+								System.out.println("begin after , found "+recordString);
+								break;
+
+							}
+							else if(str[i].equals("end")) {
+								beginCount--;
+								if(beginCount == 0) {
+									recordString = recordString + temp.charAt(pos);
+									System.out.println("end found "+recordString);
+
+									break;
+								}
+							}
+							else {
+								//If other just record 
+								recordString = recordString + temp.charAt(pos);
+								System.out.println("other found "+recordString);
+
+
+							}
+						}
+					}
+				}
+			}
+			//We only have flat Statement left.
+			else {
+				System.out.println("flat Statement left "+leftOutStatement);
+			}
+		}
+		
+		//TODO Return BlockStatement ArrayList if above code goes well 
+		for(pos = 0; pos < statement.length(); pos++)
+		{
+			blockStatement = blockStatement + statement.charAt(pos);
+		}
+		System.out.println("pos "+pos);
+		return blockStatement;
+		
+	}
 	static TestExpression parseTest(String expression)
 	{
 		//test do-math 5 + 4 < 7
@@ -168,7 +275,7 @@ public class Parser
 		return rs;
 	}
 	
-	static WhileStatement parseWhile(Expression testExpression, ArrayList<Statement> executeStatement)
+	static WhileStatement parseWhile(Expression testExpression, Statement executeStatement)
 	{
 		WhileStatement ws = new WhileStatement(testExpression, executeStatement);
 		return ws;
@@ -178,6 +285,12 @@ public class Parser
 	{
 		PrintStatement ps = new PrintStatement(expression_to_print);
 		return ps;
+	}
+	
+	static BlockStatement parseBlock(ArrayList<Statement> statements)
+	{
+		BlockStatement bs = new BlockStatement(statements);
+		return bs;
 	}
 	
 	static UpdateStatement parseUpdate(String name, Expression valueExpression)
@@ -251,7 +364,7 @@ public class Parser
 	static Statement parseStatement(String s)
 	{
 		//split the string on white space (1 or more spaces)
-		String[] theParts = s.split("\\s+");
+		String[] theParts = s.trim().split("\\s+");
 		// remember int b = do-math 5 + a;
 		//s = "remember int a = 5"
 		//parts = {"remember", "int", "a", "=", "5"}
@@ -273,38 +386,44 @@ public class Parser
 			Expression expression_to_print = Parser.parseExpression(temp);
 			return Parser.parsePrint(expression_to_print);
 		}
+		else if(theParts[0].equals("begin")) //NOT CURRENTLY COMPATIBLE WITH EMBEDDED BLOCKS
+		{
+			//begin print e, update e = do-math e - 1 end
+			String temp = s.substring("begin".length(),s.length() - "end".length()).trim();
+			//temp is currently: print e, update e = do-math e - 1
+			//how do we split this into a collection of statements?
+			//if we split on "," this would assume that there are zero block 
+			//statements inside this block statement.
+			String[] blockParts = temp.split(",");
+			ArrayList<Statement> theStatements = new ArrayList<Statement>();
+			for(String stmt : blockParts)
+			{
+				theStatements.add(Parser.parseStatement(stmt.trim()));
+			}
+			return Parser.parseBlock(theStatements);
+		}
 		else if(theParts[0].equals("while"))
 		{
 			//while <test-expression> do <statement>;
 			String temp = s.substring("while".length()).trim();
+			
+			if(s.contains("begin")) {
+				System.out.println("splitBlockTemp "+SplitBlock(s));
+//				System.out.println("SplitBlockSecond "+SplitBlockSecond(s));
+
+			}
+
+			
+//			System.out.println("splitBlockTemp IndexOf "+splitBlockTemp.indexOf("begin"));
+
+
+			
 			String[] tempParts = temp.split("do ");
 			String test_expression_string = tempParts[0].trim();
 			String execute_statement_string = tempParts[1].trim();
-			String[] tempblockParts = null;
-			ArrayList<Statement> theListOfBlockStatements = new ArrayList<Statement>();
-			if(execute_statement_string.contains("begin")) {
-				System.out.println("execute_statement_string "+execute_statement_string);
-				String blockStatements = execute_statement_string.substring("begin".length(), execute_statement_string.length() - "end".length()).trim();
-				tempblockParts = blockStatements.split(",");
-				//If it has any previous statments stored, clear them all.
-				theListOfBlockStatements.clear();
-				for(int i = 0 ; i< tempblockParts.length ;i++) {
-					System.out.println("theListOfBlockStatements "+tempblockParts[i].trim());
-					theListOfBlockStatements.add(parseStatement(tempblockParts[i].trim()));
-
-				}
-				
-			}
-			else {
-				//If it has any previous statments stored, clear them all.
-				theListOfBlockStatements.clear();
-				theListOfBlockStatements.add(parseStatement(execute_statement_string));
-			}
-			
 			Expression test_expression = Parser.parseExpression(test_expression_string);
-			return Parser.parseWhile(test_expression,theListOfBlockStatements );
-			
-			
+			Statement execute_statement = Parser.parseStatement(execute_statement_string);
+			return Parser.parseWhile(test_expression, execute_statement);
 		}
 		else if(theParts[0].equals("update"))
 		{
@@ -333,5 +452,4 @@ public class Parser
 		}
 		throw new RuntimeException("Not a known statement type: " + s);
 	}
-	 
 }
