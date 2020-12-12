@@ -6,3 +6,5 @@
 /ExpressionTree.class
 /SymbolTree.class
 /LanguageCore.class
+/RememberStatementTree.class
+/LiteralExpressionTree.class

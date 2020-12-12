@@ -6,7 +6,7 @@ package ParserTree;
 
 public class LanguageCore 
 {
-	private static String[] theReservedWords = {"=","remember", ";"};
+	private static String[] theReservedWords = {"=","remember","int",";"};
 	
 	public static boolean isReservedWord(String s)
 	{

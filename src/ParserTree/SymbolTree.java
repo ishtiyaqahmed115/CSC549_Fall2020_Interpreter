@@ -6,7 +6,12 @@ public class SymbolTree extends ExpressionPart
 	
 	public SymbolTree(String theSymbol)
 	{
-		super();
+		super("Symbol Tree");
 		this.theSymbol = theSymbol;
+	}
+	
+	public String toString()
+	{
+		return super.toString() + " : " + this.theSymbol;
 	}
 }

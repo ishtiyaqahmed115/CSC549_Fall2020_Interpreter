@@ -1,25 +1,38 @@
 package Parser;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import Interpreter.SpyderInterpreter;
+import ParserTree.LanguageCore;
+import ParserTree.ProgramTree;
 
 public class Parser 
 {
 	private static ArrayList<Statement> theListOfStatements = new ArrayList<Statement>();
+	private static ArrayList<String> theListOfTokens = new ArrayList<String>();
+
+	
 	
 	public static ArrayList<Statement> getParsedStatements()
 	{
 		return Parser.theListOfStatements;
 	}
-	
+	/**
+	 * @return the theListOfTokens
+	 */
+	public static ArrayList<String> getTheListOfTokens() {
+		return theListOfTokens;
+	}
+
 	public static void display()
 	{
 		for(Statement s : theListOfStatements)
 		{
 			System.out.println(s);
 		}
+		
 	}
 	
 	static ResolveExpression parseResolve(String name)
@@ -289,6 +302,68 @@ public class Parser
 			e.printStackTrace();
 			System.err.println("File Not Found!!!");
 		}
+	}
+	public static void parseParseTree(String filename) {
+		try {
+			Scanner input = new Scanner(new File(System.getProperty("user.dir") + "/src/" + filename));
+			String fileContents = "";
+			while(input.hasNext())
+			{
+				fileContents += input.nextLine().trim();
+			}
+			//Call the Tokenizer
+			Tokenizer(fileContents);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.err.println("File Not Found!!!");
+		}
+	}
+	
+	private static void Tokenizer(String statement){
+		
+		char character;
+		String currentString="";
+		
+		for(int index = 0 ; index < statement.length() ; index++) {
+			character = statement.charAt(index);
+			//If it found a space, check the string if it contains a reserved word
+			if(character == ' ') 
+			{
+				if(LanguageCore.isReservedWord(currentString)) {
+					//Add it to the Token List
+					theListOfTokens.add(currentString.trim());
+					currentString = "";
+				}
+				
+				
+			}
+			//It it found an equal-to sign, then
+			else if(character == '=') 
+			{
+				//Take the var name stored in the currentString and add it to the list of Tokens.
+				String varName = currentString;
+				theListOfTokens.add(varName.trim());
+				currentString = "";	
+			}
+			//It it found an end ";" sign, then
+			else if(character == ';') 
+			{
+				//It should holds a value
+				String value = currentString;
+				theListOfTokens.add(value.trim());
+				//To find the end of the line.
+				theListOfTokens.add(Character.toString(character));
+				currentString = "";
+			}
+			else
+			{
+				//Collect the characters, otherwise.
+				currentString = currentString + character;
+			}
+		}
+		
 	}
 	
 	static Expression parseExpression(String expression)

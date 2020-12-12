@@ -8,7 +8,7 @@ public class ExpressionTree extends ExpressionPart
 	
 	public ExpressionTree()
 	{
-		super();
+		super("Expression Tree");
 		this.theComponents = new ArrayList<ExpressionPart>();	
 	}
 }

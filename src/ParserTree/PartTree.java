@@ -7,8 +7,9 @@ public abstract class PartTree extends Object
 	public PartTree(String partType)
 	{
 		super();
-		this.partType = partType;
+		this.partType = partType.toString();
 	}
+	
 	
 	public String getPartType() {
 		return partType;
